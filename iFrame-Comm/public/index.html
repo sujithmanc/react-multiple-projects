@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent</title>
+</head>
+
+<body>
+    <h1>Parent Page</h1>
+    
+    <label><input type="checkbox" id="child1Checkbox"> Child-1</label>
+    <label><input type="checkbox" id="child2Checkbox"> Child-2</label>
+    <label><input type="checkbox" id="unknownCheckbox"> Unknown</label>
+    
+    <br><br>
+
+    <input type="text" id="parentInput" placeholder="Enter message">
+    <button onclick="sendMessageToSelectedChildren()">Send to Selected</button>
+
+    <table border="1" id="parentTable">
+        <tr>
+            <th>Messages from Child</th>
+            <th>From</th>
+        </tr>
+    </table>
+
+    <iframe id="childFrame" src="http://localhost:5173" width="600" height="400"></iframe>
+    <iframe id="childFrame2" src="http://localhost:5173" width="600" height="400"></iframe>
+    <iframe id="childFrame3" src="http://localhost:5173" width="600" height="400"></iframe>
+
+    <script>
+        const childFrame = document.getElementById("childFrame");
+        const childFrame2 = document.getElementById("childFrame2");
+        const childFrame3 = document.getElementById("childFrame3");
+
+        function sendMessageToSelectedChildren() {
+            const message = document.getElementById("parentInput").value;
+            
+            if (document.getElementById("child1Checkbox").checked) {
+                childFrame.contentWindow.postMessage(message, "*");
+            }
+            if (document.getElementById("child2Checkbox").checked) {
+                childFrame2.contentWindow.postMessage(message, "*");
+            }
+            if (document.getElementById("unknownCheckbox").checked) {
+                childFrame3.contentWindow.postMessage(message, "*");
+            }
+        }
+
+        window.addEventListener("message", (event) => {
+            const table = document.getElementById("parentTable");
+            const row = table.insertRow();
+            const cell = row.insertCell(0);
+            cell.textContent = event.data;
+            const cell2 = row.insertCell(1);
+
+            if (event.source === childFrame.contentWindow) {
+                cell2.textContent = 'Child-1';
+            } else if (event.source === childFrame2.contentWindow) {
+                cell2.textContent = 'Child-2';
+            } else {
+                cell2.textContent = 'Unknown';
+            }
+        });
+    </script>
+
+</body>
+
+</html>
